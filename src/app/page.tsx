@@ -61,7 +61,7 @@ export default function LoginPage() {
             </div>
 
             <form onSubmit={handleLogin} className="space-y-5">
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label
                   htmlFor="username"
                   className="text-[13px] font-semibold tracking-tight text-gray-500 uppercase"
@@ -75,12 +75,12 @@ export default function LoginPage() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={loginMutation.isPending}
-                  className="h-12 rounded-xl border-transparent bg-[#F2F2F7] px-4 text-[15px] font-medium text-black transition-all placeholder:text-gray-400 focus:border-[#007AFF] focus:bg-white focus:ring-4 focus:ring-[#007AFF]/10"
+                  className="mt-2 h-12 rounded-xl border-transparent bg-[#F2F2F7] px-4 text-[15px] font-medium text-black transition-all placeholder:text-gray-400 focus:border-[#007AFF] focus:bg-white focus:ring-4 focus:ring-[#007AFF]/10"
                   autoComplete="username"
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label
                     htmlFor="password"
@@ -89,10 +89,12 @@ export default function LoginPage() {
                     Password
                   </Label>
                   <a
-                    href="#"
+                    href="https://webmail.erajaya.com/public/PasswordRecovery.jsp?"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-[13px] font-medium text-[#007AFF] transition-colors hover:text-[#007AFF]/80"
                   >
-                    Forgot?
+                    Forgot Password?
                   </a>
                 </div>
                 <Input

@@ -1,65 +1,136 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useLogin } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+export default function LoginPage() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
+  const loginMutation = useLogin();
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!username || !password) {
+      toast.error("Validation Error", {
+        description: "Please enter both username and password",
+      });
+      return;
+    }
+
+    loginMutation.mutate(
+      { username, password },
+      {
+        onSuccess: () => {
+          toast.success("Welcome back", {
+            description: "Accessing secure workspace...",
+          });
+          router.push("/dashboard/home");
+        },
+        onError: (error: any) => {
+          toast.error("Authentication Failed", {
+            description: error?.response?.data?.error_message || "Invalid credentials",
+          });
+        },
+      }
+    );
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-[#F2F2F7]">
+      {/* Main Content */}
+      <div className="z-10 w-full px-4">
+        <div className="mx-auto flex w-full max-w-md flex-col items-center gap-8">
+          {/* Brand Logo */}
+          <div className="animate-in fade-in zoom-in-95 flex flex-col items-center gap-2 duration-500">
+            <span className="text-4xl font-bold tracking-tight text-[#000000]">Sentispace</span>
+            <p className="text-[15px] text-gray-500">Security Operations Center</p>
+          </div>
+
+          {/* Card */}
+          <div className="group animate-in slide-in-from-bottom-4 w-full rounded-3xl bg-white p-8 shadow-sm duration-700">
+            <div className="mb-6 flex flex-col text-center">
+              <h1 className="text-2xl font-bold tracking-tight text-black">Sign In</h1>
+              <p className="mt-2 text-[15px] text-gray-500">Enter your credentials to continue</p>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="username"
+                  className="text-[13px] font-semibold tracking-tight text-gray-500 uppercase"
+                >
+                  Username
+                </Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="name@company.com"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={loginMutation.isPending}
+                  className="h-12 rounded-xl border-transparent bg-[#F2F2F7] px-4 text-[15px] font-medium text-black transition-all placeholder:text-gray-400 focus:border-[#007AFF] focus:bg-white focus:ring-4 focus:ring-[#007AFF]/10"
+                  autoComplete="username"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="password"
+                    className="text-[13px] font-semibold tracking-tight text-gray-500 uppercase"
+                  >
+                    Password
+                  </Label>
+                  <a
+                    href="#"
+                    className="text-[13px] font-medium text-[#007AFF] transition-colors hover:text-[#007AFF]/80"
+                  >
+                    Forgot?
+                  </a>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loginMutation.isPending}
+                  className="h-12 rounded-xl border-transparent bg-[#F2F2F7] px-4 text-[15px] font-medium text-black transition-all placeholder:text-gray-400 focus:border-[#007AFF] focus:bg-white focus:ring-4 focus:ring-[#007AFF]/10"
+                  autoComplete="current-password"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="mt-6 h-12 w-full rounded-xl bg-[#007AFF] text-[17px] font-semibold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[#007AFF]/90 hover:shadow-blue-500/30 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={loginMutation.isPending}
+              >
+                {loginMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Signing In...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
+            </form>
+          </div>
+
+          <div className="animate-in fade-in mt-2 text-center delay-300 duration-1000">
+            <p className="text-[13px] text-gray-400">
+              Authorized personnel only · All activities are monitored
+            </p>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }
